@@ -23,6 +23,15 @@
 #include "mozmemory.h"
 #include "js/TypeDecls.h"
 
+namespace JScript {
+
+extern void logMalloc (size_t bytes);
+extern void logCalloc (size_t bytes);
+extern void logRealloc (void* p, size_t bytes);
+extern void logFree (void* p);
+
+};
+
 /* The public JS engine namespace. */
 namespace JS {}
 
@@ -382,6 +391,7 @@ extern void AssertJSStringBufferInCorrectArena(const void* ptr);
 static inline void* js_arena_malloc(arena_id_t arena, size_t bytes) {
   JS_OOM_POSSIBLY_FAIL();
   JS_CHECK_LARGE_ALLOC(bytes);
+  JScript::logMalloc (bytes);
   return moz_arena_malloc(arena, bytes);
 }
 
@@ -392,6 +402,7 @@ static inline void* js_malloc(size_t bytes) {
 static inline void* js_arena_calloc(arena_id_t arena, size_t bytes) {
   JS_OOM_POSSIBLY_FAIL();
   JS_CHECK_LARGE_ALLOC(bytes);
+  JScript::logCalloc (bytes);
   return moz_arena_calloc(arena, bytes, 1);
 }
 
@@ -399,6 +410,7 @@ static inline void* js_arena_calloc(arena_id_t arena, size_t nmemb,
                                     size_t size) {
   JS_OOM_POSSIBLY_FAIL();
   JS_CHECK_LARGE_ALLOC(nmemb * size);
+  JScript::logCalloc (nmemb * size);
   return moz_arena_calloc(arena, nmemb, size);
 }
 
@@ -418,6 +430,7 @@ static inline void* js_arena_realloc(arena_id_t arena, void* p, size_t bytes) {
 
   JS_OOM_POSSIBLY_FAIL();
   JS_CHECK_LARGE_ALLOC(bytes);
+  JScript::logRealloc (p, bytes);
   return moz_arena_realloc(arena, p, bytes);
 }
 
@@ -430,6 +443,7 @@ static inline void js_free(void* p) {
   // currently can't enforce that all memory freed here was allocated by
   // js_malloc(). All other memory should go through a different allocator and
   // deallocator.
+  JScript::logFree (p);
   free(p);
 }
 #endif /* JS_USE_CUSTOM_ALLOCATOR */

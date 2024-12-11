@@ -3573,7 +3573,7 @@ def ar_config(c_compiler, toolchain_prefix=None):
         if c_compiler.type == "clang-cl":
             return namespace(
                 names=("llvm-lib",),
-                flags=("-llvmlibthin", "-out:$@"),
+                flags=("-out:$@"),
             )
 
         names = tuple("%s%s" % (p, "ar") for p in (toolchain_prefix or ()) + ("",))

@@ -10,4 +10,6 @@
 # hardcoded milestones in the tree from these two files.
 #--------------------------------------------------------
 
-133.0.3
+# Use {version}a1 to enable error reporting via "nightly" builds
+
+133.0.3a1

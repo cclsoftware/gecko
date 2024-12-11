@@ -835,11 +835,11 @@ void wasm::EnsureEagerProcessSignalHandlers() {
   // such as Breakpad that assume we are crashing.
   const bool firstHandler = true;
 #    endif
-  if (!AddVectoredExceptionHandler(firstHandler, WasmTrapHandler)) {
+//  if (!AddVectoredExceptionHandler(firstHandler, WasmTrapHandler)) {
     // Windows has all sorts of random security knobs for disabling things
     // so make this a dynamic failure that disables wasm, not a MOZ_CRASH().
     return;
-  }
+//  }
 
 #  elif defined(XP_DARWIN)
   // All the Mach setup in EnsureLazyProcessSignalHandlers.
