@@ -140,10 +140,6 @@ elif platform == 'linux':
     architectures = ['x86_64', 'aarch64']
 
     for architecture in architectures:
-        os.environ['CC'] = architecture + '-linux-gnu-gcc'
-        os.environ['CXX'] = architecture + '-linux-gnu-g++'
-        os.environ['AR'] = architecture + '-linux-gnu-ar'
-        os.environ['BINDGEN_CFLAGS'] = '--sysroot /usr/' + architecture + '-linux-gnu'
         build_one (platform, architecture)
 
     with zipfile.ZipFile (basedir + '/spidermonkey-' + version + '.linux.zip', mode = 'w') as buildproducts:

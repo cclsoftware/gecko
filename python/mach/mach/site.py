@@ -1222,7 +1222,10 @@ def _assert_pip_check(pthfile_lines, virtualenv_name, requirements):
         if check_result.returncode:
             subprocess.check_call(pip + ["list", "-v"], stdout=sys.stderr)
             print(check_result.stdout, file=sys.stderr)
-            raise Exception(
+
+            # Ignore 'pip check' errors due to Ubuntu 24.04 bug 2084358:
+            #     https://bugs.launchpad.net/ubuntu/+source/python-debianbts/+bug/2084358
+            print(
                 'According to "pip check", the current Python '
                 "environment has package-compatibility issues."
             )
