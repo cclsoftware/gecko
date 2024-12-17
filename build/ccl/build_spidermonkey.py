@@ -30,8 +30,8 @@ def create_mozconfig (platform, arch):
         config += 'ac_add_options --disable-optimize\n'
 
     if platform == 'macos':
-        config += 'ac_add_options --with-macos-sdk=/Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk\n'
-        config += 'ac_add_options --enable-macos-target=10.13\n'
+        config += 'ac_add_options --with-macos-sdk=/Library/Developer/CommandLineTools/SDKs/MacOSX14.2.sdk\n'
+        config += 'ac_add_options --enable-macos-target=12.4\n'
 
     if platform == 'win' or platform == 'android':
         if not args.debug and not args.symbols:
