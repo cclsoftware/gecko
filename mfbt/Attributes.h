@@ -79,7 +79,7 @@
 #endif
 
 /* if defined(__clang__) && __has_attribute (attr) may not be portable */
-#if defined(__clang__)
+#if defined(__clang__) && !defined(__ANDROID__)
 #  define MOZ_HAS_CLANG_ATTRIBUTE(attr) __has_attribute(attr)
 #else
 #  define MOZ_HAS_CLANG_ATTRIBUTE(attr) 0
