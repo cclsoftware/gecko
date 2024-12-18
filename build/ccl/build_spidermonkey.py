@@ -19,6 +19,7 @@ import os
 import subprocess
 import sys
 import zipfile
+import shutil
 
 def create_mozconfig (platform, arch):
     config = '# Build only the JS shell\n'
@@ -33,7 +34,10 @@ def create_mozconfig (platform, arch):
         config += 'ac_add_options --with-macos-sdk=/Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk\n'
         config += 'ac_add_options --enable-macos-target=12.4\n'
 
-    if platform == 'win' or platform == 'android':
+    if platform == 'ios':
+        config += 'ac_add_options --enable-ios-target=15.4\n'
+
+    if platform == 'win' or platform == 'android' or platform == 'ios':
         if not args.debug and not args.symbols:
             config += 'ac_add_options --disable-debug-symbols\n'
 
@@ -42,6 +46,8 @@ def create_mozconfig (platform, arch):
     if platform == 'android':
         config += 'ac_add_options --with-android-ndk=c:/mozilla-build/android-ndk-r27c\n'
         config += 'ac_add_options --target=' + arch + '-linux-android' + '\n'
+    elif platform == 'ios':
+        config += 'ac_add_options --target=' + arch + '-aaple-ios' + '\n'
     else:
         config += 'ac_add_options --target=' + arch + '\n'
 
@@ -52,10 +58,10 @@ def create_mozconfig (platform, arch):
     return config
 
 def exec_mach (command):
-	if platform == 'macos' or platform == 'linux':
-		subprocess.run ([machpath, command])
-	elif platform == 'win' or platform == 'android':
-		subprocess.run (['python3', machpath, command])
+    if platform == 'macos' or platform == 'ios' or platform == 'linux':
+        subprocess.run ([machpath, command])
+    elif platform == 'win' or platform == 'android':
+        subprocess.run (['python3', machpath, command])
 
 def build_one (platform, arch):
     with open ('MOZCONFIG', '+w') as f:
@@ -129,6 +135,23 @@ if platform == 'macos':
     subprocess.run (['/usr/bin/lipo', '-create', '-output', 'libjsrust.a', 'obj-macos-x86_64/x86_64-apple-darwin/' + folder + '/libjsrust.a', 'obj-macos-aarch64/aarch64-apple-darwin/' + folder + '/libjsrust.a'])
 
     with zipfile.ZipFile (basedir + '/spidermonkey-' + version + '.mac.zip', mode = 'w') as buildproducts:
+        os.chdir ('obj-' + platform + '-' + architectures[0])
+        zip_dir (buildproducts, 'dist/include')
+        os.chdir ('..')
+
+        buildproducts.write ('libjs_static.a')
+        buildproducts.write ('libjsrust.a')
+
+if platform == 'ios':
+    architectures = ['aarch64']
+
+    for architecture in architectures:
+        build_one (platform, architecture)
+
+        shutil.copy('obj-ios-aarch64/js/src/build/libjs_static.a', ".")
+        shutil.copy('obj-ios-aarch64/aarch64-apple-ios/' + folder + '/libjsrust.a', ".")
+
+    with zipfile.ZipFile (basedir + '/spidermonkey-' + version + '.ios.zip', mode = 'w') as buildproducts:
         os.chdir ('obj-' + platform + '-' + architectures[0])
         zip_dir (buildproducts, 'dist/include')
         os.chdir ('..')

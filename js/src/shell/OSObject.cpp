@@ -1057,8 +1057,11 @@ static bool os_system(JSContext* cx, unsigned argc, Value* vp) {
   if (!narrowCommand) {
     return false;
   }
-
+#  ifdef XP_IOS
+  int result = 0;
+#  else
   int result = system(narrowCommand.get());
+#  endif
 #  endif
   if (result == -1) {
     ReportSysError(cx, "system call failed");
