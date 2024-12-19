@@ -995,11 +995,15 @@ bool js::jit::ReprotectRegion(void* start, size_t size,
 void js::jit::AutoMarkJitCodeWritableForThread::markExecutable(
     bool executable) {
 #  if defined(XP_IOS)
+  #if 1
+  MOZ_CRASH("JIT not available");
+  #else
   if (executable) {
     be_memory_inline_jit_restrict_rwx_to_rx_with_witness();
   } else {
     be_memory_inline_jit_restrict_rwx_to_rw_with_witness();
   }
+  #endif
 #  else
   if (__builtin_available(macOS 11.0, *)) {
     pthread_jit_write_protect_np(executable);
