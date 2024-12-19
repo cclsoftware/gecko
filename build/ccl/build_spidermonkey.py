@@ -37,6 +37,7 @@ def create_mozconfig (platform, arch):
     if platform == 'ios':
         config += 'ac_add_options --with-macos-sdk=/Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk\n'
         config += 'ac_add_options --enable-ios-target=15.4\n'
+        config += 'ac_add_options --disable-jit\n'
 
     if platform == 'win' or platform == 'android' or platform == 'ios':
         if not args.debug and not args.symbols:
