@@ -31,11 +31,11 @@ def create_mozconfig (platform, arch):
         config += 'ac_add_options --disable-optimize\n'
 
     if platform == 'macos':
-        config += 'ac_add_options --with-macos-sdk=/Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk\n'
+        config += 'ac_add_options --with-macos-sdk=/Library/Developer/CommandLineTools/SDKs/MacOSX14.sdk\n'
         config += 'ac_add_options --enable-macos-target=12.4\n'
 
     if platform == 'ios':
-        config += 'ac_add_options --with-macos-sdk=/Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk\n'
+        config += 'ac_add_options --with-macos-sdk=/Library/Developer/CommandLineTools/SDKs/MacOSX14.sdk\n'
         config += 'ac_add_options --enable-ios-target=15.4\n'
         config += 'ac_add_options --disable-jit\n'
 

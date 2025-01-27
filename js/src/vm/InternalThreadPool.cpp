@@ -20,7 +20,11 @@
 // of 2MB or larger risks the kernel allocating an entire 2MB huge page for it
 // on first access, which we do not want. To avoid this possibility, we subtract
 // 2 standard VM page sizes from our default.
+#if defined(XP_IOS)
+static const uint32_t kDefaultHelperStackSize = 1048 * 1024 - 2 * 4096;
+#else
 static const uint32_t kDefaultHelperStackSize = 2048 * 1024 - 2 * 4096;
+#endif
 
 // TSan enforces a minimum stack size that's just slightly larger than our
 // default helper stack size.  It does this to store blobs of TSan-specific
