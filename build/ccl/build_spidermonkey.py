@@ -34,12 +34,11 @@ def create_mozconfig (platform, arch):
         config += 'ac_add_options --with-macos-sdk=/Library/Developer/CommandLineTools/SDKs/MacOSX14.sdk\n'
         config += 'ac_add_options --enable-macos-target=12.4\n'
 
-    if platform == 'ios':
-        config += 'ac_add_options --with-macos-sdk=/Library/Developer/CommandLineTools/SDKs/MacOSX14.sdk\n'
+    if platform == 'ios' or platform == 'ios-sim':
         config += 'ac_add_options --enable-ios-target=15.4\n'
         config += 'ac_add_options --disable-jit\n'
 
-    if platform == 'win' or platform == 'android' or platform == 'ios':
+    if platform == 'win' or platform == 'android' or platform == 'ios' or platform == 'ios-sim':
         if not args.debug and not args.symbols:
             config += 'ac_add_options --disable-debug-symbols\n'
 
@@ -50,6 +49,8 @@ def create_mozconfig (platform, arch):
         config += 'ac_add_options --target=' + arch + '-linux-android' + '\n'
     elif platform == 'ios':
         config += 'ac_add_options --target=' + arch + '-aaple-ios' + '\n'
+    elif platform == 'ios-sim':
+        config += 'ac_add_options --target=' + arch + '-aaple-ios-sim' + '\n' 
     else:
         config += 'ac_add_options --target=' + arch + '\n'
 
@@ -60,7 +61,7 @@ def create_mozconfig (platform, arch):
     return config
 
 def exec_mach (command):
-    if platform == 'macos' or platform == 'ios' or platform == 'linux':
+    if platform == 'macos' or platform == 'ios' or platform == 'ios-sim' or platform == 'linux':
         subprocess.run ([machpath, command])
     elif platform == 'win' or platform == 'android':
         subprocess.run (['python3', machpath, command])
@@ -74,6 +75,14 @@ def build_one (platform, arch):
     if (platform == 'macos') and not args.debug and not args.symbols:
         subprocess.run (['/usr/bin/strip', '-u', '-r', '-S', 'obj-' + platform + '-' + arch + '/js/src/build/libjs_static.a'])
         subprocess.run (['/usr/bin/strip', '-u', '-r', '-S', 'obj-' + platform + '-' + arch + '/' + arch + '-apple-darwin/release/libjsrust.a'])
+
+    if (platform == 'ios') and not args.debug and not args.symbols:
+        subprocess.run (['/usr/bin/strip', '-u', '-r', '-S', 'obj-' + platform + '-' + arch + '/js/src/build/libjs_static.a'])
+        subprocess.run (['/usr/bin/strip', '-u', '-r', '-S', 'obj-' + platform + '-' + arch + '/' + arch + '-apple-ios/release/libjsrust.a'])
+
+    if (platform == 'ios-sim') and not args.debug and not args.symbols:
+        subprocess.run (['/usr/bin/strip', '-u', '-r', '-S', 'obj-' + platform + '-' + arch + '/js/src/build/libjs_static.a'])
+        subprocess.run (['/usr/bin/strip', '-u', '-r', '-S', 'obj-' + platform + '-' + arch + '/' + arch + '-apple-ios-sim/release/libjsrust.a'])
 
     if (platform == 'linux') and not args.debug and not args.symbols:
         if arch == 'x86_64':
@@ -144,7 +153,7 @@ if platform == 'macos':
         buildproducts.write ('libjs_static.a')
         buildproducts.write ('libjsrust.a')
 
-if platform == 'ios':
+elif platform == 'ios' :
     architectures = ['aarch64']
 
     for architecture in architectures:
@@ -155,6 +164,21 @@ if platform == 'ios':
 
     with zipfile.ZipFile (basedir + '/spidermonkey-' + version + '.ios.zip', mode = 'w') as buildproducts:
         os.chdir ('obj-' + platform + '-' + architectures[0])
+        zip_dir (buildproducts, 'dist/include')
+        os.chdir ('..')
+
+        buildproducts.write ('libjs_static.a')
+        buildproducts.write ('libjsrust.a')
+
+elif platform == 'ios-sim' :
+    build_one ('ios-sim', 'aarch64')
+    build_one ('ios', 'x86_64')
+
+    subprocess.run (['/usr/bin/lipo', '-create', '-output', 'libjs_static.a', 'obj-ios-x86_64/js/src/build/libjs_static.a', 'obj-ios-aarch64/js/src/build/libjs_static.a'])
+    subprocess.run (['/usr/bin/lipo', '-create', '-output', 'libjsrust.a', 'obj-ios-x86_64/x86_64-apple-ios/' + folder + '/libjsrust.a', 'obj-ios-aarch64/aarch64-apple-ios-sim/' + folder + '/libjsrust.a'])
+
+    with zipfile.ZipFile (basedir + '/spidermonkey-' + version + '.ios-sim.zip', mode = 'w') as buildproducts:
+        os.chdir ('obj-' + platform + '-' + 'aarch64')
         zip_dir (buildproducts, 'dist/include')
         os.chdir ('..')
 

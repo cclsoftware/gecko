@@ -22,7 +22,7 @@ namespace mozilla {
 
 namespace detail {
 
-#ifdef XP_MACOSX
+#if defined(XP_MACOSX) || defined (XP_IOS)
 #  if defined(__has_feature)
 #    if __has_feature(cxx_thread_local)
 #      define MACOSX_HAS_THREAD_LOCAL
