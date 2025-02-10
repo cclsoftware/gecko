@@ -174,7 +174,7 @@ elif platform == 'ios-sim' :
     build_one ('ios-sim', 'aarch64')
     build_one ('ios', 'x86_64')
 
-    subprocess.run (['/usr/bin/lipo', '-create', '-output', 'libjs_static.a', 'obj-ios-x86_64/js/src/build/libjs_static.a', 'obj-ios-aarch64/js/src/build/libjs_static.a'])
+    subprocess.run (['/usr/bin/lipo', '-create', '-output', 'libjs_static.a', 'obj-ios-x86_64/js/src/build/libjs_static.a', 'obj-ios-sim-aarch64/js/src/build/libjs_static.a'])
     subprocess.run (['/usr/bin/lipo', '-create', '-output', 'libjsrust.a', 'obj-ios-x86_64/x86_64-apple-ios/' + folder + '/libjsrust.a', 'obj-ios-sim-aarch64/aarch64-apple-ios-sim/' + folder + '/libjsrust.a'])
 
     with zipfile.ZipFile (basedir + '/spidermonkey-' + version + '.ios-sim.zip', mode = 'w') as buildproducts:
