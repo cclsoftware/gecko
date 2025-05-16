@@ -186,6 +186,17 @@ MOZ_ALWAYS_INLINE bool AutoCheckRecursionLimit::checkLimitImpl(
     JS::NativeStackLimit limit, void* sp) const {
   JS_STACK_OOM_POSSIBLY_FAIL();
 
+
+#if defined XP_DARWIN
+if(!pthread_main_np())
+  return true;
+#elif defined XP_LINUX
+if(gettid() != getpid())
+  return true;
+#elif defined XP_WINDOWS
+// TODO
+#endif
+
 #ifdef __wasi__
   if (!checkWasiRecursionLimit()) {
     return false;
